@@ -2,6 +2,11 @@
 <img src="https://user-images.githubusercontent.com/33676/111815108-4695b900-88a9-11eb-8b61-3c45b40d4df6.png" width="250" alt=""/>
 </p>
 
+<p align="center">
+  <img src="https://img.shields.io/npm/v/package-build-stats.svg" />
+  <img src="https://img.shields.io/npm/l/package-build-stats.svg" />
+</p>
+
 **The ½ kb _state machine_ hook for React:**
 
 - Feature complete (Entry/exit callbacks, Guarded transitions & Extended State - Context)
