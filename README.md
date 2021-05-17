@@ -3,8 +3,9 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/npm/v/package-build-stats.svg" />
-  <img src="https://img.shields.io/npm/l/package-build-stats.svg" />
+  <img src="https://img.shields.io/github/v/release/cassiozen/usestatemachine.svg?label=npm" />
+  <img src="https://img.shields.io/github/checks-status/cassiozen/usestatemachine/main.svg" />
+  <img src="https://img.shields.io/bundlephobia/minzip/@cassiozen/usestatemachine.svg" />
 </p>
 
 **The ½ kb _state machine_ hook for React:**
