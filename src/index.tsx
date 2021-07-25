@@ -24,8 +24,8 @@ const useStateMachineImpl = (definition: Machine.Definition.Impl) => {
     return typeof exit === "function"
       ? () => exit?.({ send, setContext, event: state.event, context: state.context })
       : undefined;
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [state.value, state.event]); 
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [state.value, state.event]);
 
   return [state, send];
 };
@@ -37,6 +37,8 @@ const createInitialState = (definition: Machine.Definition.Impl): Machine.State.
   nextEvents: R.keys(
     R.concat(R.fromMaybe(R.get(definition.states, definition.initial)!.on), R.fromMaybe(definition.on))
   ),
+  // To solve: making this available on initial state
+  mayTransition: () => true,
 });
 
 const createReducer = (definition: Machine.Definition.Impl) => {
@@ -90,6 +92,27 @@ const createReducer = (definition: Machine.Definition.Impl) => {
         context,
         event,
         nextEvents: R.keys(R.concat(R.fromMaybe(stateNode.on), R.fromMaybe(definition.on))),
+        mayTransition: (sendable) => {
+          // This is copy/pasted from above, and could go in a function
+          let event = typeof sendable === "string" ? { type: sendable } : sendable;
+          const targetTransition =
+            R.get(R.fromMaybe(stateNode.on), event.type) ?? R.get(R.fromMaybe(definition.on), event.type);
+          if (!targetTransition) {
+            return false; // and probably log
+          }
+          let selectedTransition =
+            typeof targetTransition === "string"
+              ? { target: targetTransition }
+              : targetTransition.guard === undefined
+              ? { target: targetTransition.target }
+              : targetTransition.guard({ context, event })
+              ? { target: targetTransition.target }
+              : { target: targetTransition.target, isDenied: true };
+          if ("isDenied" in selectedTransition && selectedTransition.isDenied) {
+            return false;
+          }
+          return true;
+        },
       };
     }
 
@@ -109,16 +132,18 @@ interface SendEvent {
 
 type InternalEvent = SetContextEvent | SendEvent;
 
-const createLogger = (definition: Machine.Definition.Impl) => (groupLabel: string, ...nested: [string, any][]) => {
-  if (!definition.verbose) return;
-  if (process.env.NODE_ENV === "development") {
-    console.groupCollapsed("%cuseStateMachine", "color: #888; font-weight: lighter;", groupLabel);
-    nested.forEach(message => {
-      console.log(message[0], message[1]);
-    });
-    console.groupEnd();
-  }
-};
+const createLogger =
+  (definition: Machine.Definition.Impl) =>
+  (groupLabel: string, ...nested: [string, any][]) => {
+    if (!definition.verbose) return;
+    if (process.env.NODE_ENV === "development") {
+      console.groupCollapsed("%cuseStateMachine", "color: #888; font-weight: lighter;", groupLabel);
+      nested.forEach((message) => {
+        console.log(message[0], message[1]);
+      });
+      console.groupEnd();
+    }
+  };
 
 const useStateMachine = useStateMachineImpl as UseStateMachine;
 export default useStateMachine;

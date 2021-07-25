@@ -331,6 +331,7 @@ export namespace Machine {
         , context: Context<D>
         , event?: EntryEventForStateValue<D, Value>
         , nextEvents?: A.Get<ExitEventForStateValue<D, Value>, "type">[]
+        , mayTransition: (event: Event.Impl["type"]) => boolean
         }
       : never
   
@@ -340,6 +341,7 @@ export namespace Machine {
       , context: Context.Impl
       , event?: Event.Impl
       , nextEvents: Event.Impl["type"][]
+      , mayTransition: (event: Event.Impl["type"]) => boolean
       }
   }
 }
